@@ -120,7 +120,7 @@ class MainActivity : Activity() {
         url = EditText(this).apply {
             hint = "آدرس WebSocket سرور"
             textSize = 15f
-            singleLine = true
+            setSingleLine(true)
         }
         code = EditText(this).apply {
             hint = "کد اتصال، مثلاً 1234"

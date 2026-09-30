@@ -67,20 +67,17 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(Color.WHITE)
         }
-
         val scroll = ScrollView(this)
         val page = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(20), dp(18), dp(20), dp(28))
         }
-
         val title = text("VoiceLink", 30f, true).apply {
             gravity = Gravity.CENTER
             setTextColor(green)
         }
         page.addView(title, LinearLayout.LayoutParams(-1, dp(48)))
         page.addView(text("تماس صوتی ساده و خانوادگی", 15f).apply { gravity = Gravity.CENTER })
-
         page.addView(text("نقش این گوشی", 18f, true))
         role = Spinner(this)
         role.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
@@ -104,7 +101,6 @@ class MainActivity : Activity() {
         page.addView(primaryAction, LinearLayout.LayoutParams(-1, dp(62)).apply {
             setMargins(0, 0, 0, dp(10))
         })
-
         val disconnect = button("قطع تماس")
         disconnect.setOnClickListener { disconnectCall() }
         page.addView(disconnect, LinearLayout.LayoutParams(-1, dp(54)))
@@ -121,7 +117,6 @@ class MainActivity : Activity() {
             visibility = View.GONE
             setPadding(dp(8), dp(8), dp(8), dp(8))
         }
-
         url = EditText(this).apply {
             hint = "آدرس WebSocket سرور"
             textSize = 15f
@@ -134,7 +129,6 @@ class MainActivity : Activity() {
         }
         settingsPanel.addView(url)
         settingsPanel.addView(code)
-
         val connect = button("🔗 اتصال به سرور")
         settingsPanel.addView(connect, LinearLayout.LayoutParams(-1, dp(54)).apply {
             setMargins(0, dp(8), 0, 0)
@@ -149,14 +143,12 @@ class MainActivity : Activity() {
         settingsButton.setOnClickListener {
             settingsPanel.visibility = if (settingsPanel.visibility == View.GONE) View.VISIBLE else View.GONE
         }
-
         role.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 primaryAction.text = if (position == 0) "📞 برقراری تماس" else "🔔 آماده دریافت تماس"
             }
         }
-
         connect.setOnClickListener { connectToServer() }
         primaryAction.setOnClickListener { startCall() }
 
@@ -180,7 +172,6 @@ class MainActivity : Activity() {
         peer?.dispose()
         remoteDescriptionSet = false
         pendingCandidates.clear()
-
         val iceServers = listOf(
             PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer()
         )
@@ -196,7 +187,6 @@ class MainActivity : Activity() {
                     put("candidate", candidate.sdp)
                 })
             }
-
             override fun onIceConnectionChange(state: PeerConnection.IceConnectionState) {
                 runOnUiThread {
                     status.text = when (state) {
@@ -208,17 +198,13 @@ class MainActivity : Activity() {
                     }
                 }
             }
-
             override fun onAddStream(stream: MediaStream) {
                 runOnUiThread { status.text = "🟢 صدای طرف مقابل متصل شد" }
             }
-
             override fun onSignalingChange(state: PeerConnection.SignalingState) {}
             override fun onIceConnectionReceivingChange(receiving: Boolean) {}
             override fun onIceGatheringChange(state: PeerConnection.IceGatheringState) {}
             override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>) {}
-            override fun onAddIceCandidate(candidate: IceCandidate) {}
-            override fun onIceConnectionChangeLegacy(state: PeerConnection.IceConnectionState) {}
             override fun onDataChannel(dataChannel: DataChannel) {}
             override fun onRenegotiationNeeded() {}
             override fun onAddTrack(receiver: RtpReceiver, mediaStreams: Array<out MediaStream>) {}
@@ -232,9 +218,7 @@ class MainActivity : Activity() {
         val audioSource = factory?.createAudioSource(MediaConstraints())
         localAudio = factory?.createAudioTrack("voicelink_audio", audioSource)
         localAudio?.setEnabled(true)
-        localAudio?.let { track ->
-            peer?.addTrack(track, listOf("voicelink_stream"))
-        }
+        localAudio?.let { track -> peer?.addTrack(track, listOf("voicelink_stream")) }
     }
 
     private fun startCall() {
@@ -329,8 +313,7 @@ class MainActivity : Activity() {
     }
 
     private fun sendSignal(message: JSONObject) {
-        val currentCode = code.text.toString().trim()
-        message.put("code", currentCode)
+        message.put("code", code.text.toString().trim())
         ws?.send(message.toString())
     }
 
@@ -353,9 +336,7 @@ class MainActivity : Activity() {
                 }
                 webSocket.send(join.toString())
             }
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                handleSignal(text)
-            }
+            override fun onMessage(webSocket: WebSocket, text: String) { handleSignal(text) }
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 runOnUiThread {
                     status.text = "🔴 خطای اتصال به سرور"

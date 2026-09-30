@@ -125,7 +125,7 @@ class MainActivity : Activity() {
         code = EditText(this).apply {
             hint = "کد اتصال، مثلاً 1234"
             textSize = 15f
-            singleLine = true
+            setSingleLine(true)
         }
         settingsPanel.addView(url)
         settingsPanel.addView(code)
@@ -156,7 +156,7 @@ class MainActivity : Activity() {
 
         primaryAction.setOnClickListener {
             val currentCode = code.text.toString().trim()
-            ws?.send("""{"type":"call","code":"${code.text}"}""".replace("${code.text}", currentCode))
+            ws?.send("""{"type":"call","code":"$currentCode"}""")
             status.text = if (role.selectedItemPosition == 0) "📞 درخواست تماس ارسال شد" else "🔔 پیام تماس بررسی شد"
         }
 
@@ -180,9 +180,9 @@ class MainActivity : Activity() {
                     status.text = "🟢 اتصال برقرار است"
                     primaryAction.isEnabled = true
                 }
-                val join = """{"type":"join","code":"${code.text}","role":"@@ROLE@@"}"""
-                    .replace("${code.text}", code.text.toString())
-                    .replace("@@ROLE@@", role.selectedItem.toString())
+                val currentCode = code.text.toString().trim()
+                val currentRole = role.selectedItem.toString()
+                val join = """{"type":"join","code":"$currentCode","role":"$currentRole"}"""
                 webSocket.send(join)
             }
             override fun onMessage(webSocket: WebSocket, text: String) {
